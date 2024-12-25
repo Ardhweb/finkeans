@@ -14,9 +14,11 @@
         <!-- Table to display columns dynamically -->
         <table class="table table-bordered table-striped table-hover shadow-sm p-3 mb-3">
             <thead class="table-dark">
+
                 <tr>
 
                 </tr>
+             
             </thead>
             <tbody>
                 <tr>
@@ -39,7 +41,6 @@
         <div class="col-auto">
             <button  id="col_adding_btn" type="button" class="btn btn-secondary mb-3" 
                     hx-post="{% url 'club:add_column_head_form' %}"
-                    hx-include="#form-container"
                     hx-target="thead tr"
                     hx-swap="beforeend">
                 <i class="fas fa-plus"></i> Add Another Column
@@ -59,72 +60,23 @@
         const input = document.getElementById('id_column_head_form-TOTAL_FORMS');
         let currentValue = parseInt(input.value, 10) || 0;
         input.value = currentValue + 1;
-    
-        // Delay the update for a moment to ensure the new form is rendered in the DOM
         setTimeout(function() {
-            // Get the current total number of forms
-            const totalFormsValue = parseInt(document.getElementById('id_column_head_form-TOTAL_FORMS').value, 10);
+            
+            let elements = document.querySelectorAll('.column-head-form-container');
+            let lastElement = elements[elements.length - 1]; // Last element with the class
+            let lastChild = lastElement.lastElementChild.firstElementChild; // Last child of the last element
+            lastChild.id = `id_column_head_form-${input.value-1}-column_title`
+            lastChild.name = `id_column_head_form-${input.value-1}-column_title`
+            lastElement.lastElementChild.lastElementChild.id = `id_column_head_form-${input.value-1}-basemodel_ptr`
+              lastElement.lastElementChild.lastElementChild.name = `column_head_form-${input.value-1}-basemodel_ptr`
+            console.log("Last child of the last element:", lastChild);
+          }, 2000);  // Wait 1000ms (1 second) before executing the code
+          
     
-            if (!isNaN(totalFormsValue)) {
-                // Find all elements that have a name starting with 'column_head_form-'
-                const elements = document.querySelectorAll('[name^="column_head_form-"]');
     
-                // Loop through all elements and update their name and id attributes based on total forms count
-                for (let index = 0; index < totalFormsValue; index++) {
-                    const element = elements[index];
-    
-                    // Calculate the new index to replace in name and id
-                    const updatedName = element.name.replace(/\d+/, index); // Replace the old index with the new one
-                    element.setAttribute('name', updatedName);
-    
-                    const updatedId = element.id.replace(/\d+/, index); // Similarly update the id attribute
-                    element.setAttribute('id', updatedId);
-                }
-            }
-        }, 500); // Adjust delay if needed to ensure the form is added in the DOM
     });
     
-    // MutationObserver to detect when new forms are added dynamically via htmx
-    const observer = new MutationObserver(function(mutationsList) {
-        mutationsList.forEach(function(mutation) {
-            // If new form fields are added, update their name and id
-            if (mutation.type === 'childList') {
-                // Call the update function after detecting DOM changes
-                updateFormFields();
-            }
-        });
-    });
-    
-    // Start observing changes to the formset container
-    const formContainer = document.getElementById('form-container');
-    observer.observe(formContainer, { childList: true, subtree: true });
-    
-    // Function to update name and id attributes for form fields
-    function updateFormFields() {
-        const totalFormsValue = parseInt(document.getElementById('id_column_head_form-TOTAL_FORMS').value, 10);
-    
-        if (!isNaN(totalFormsValue)) {
-            // Find all elements that have a name starting with 'column_head_form-'
-            const elements = document.querySelectorAll('[name^="column_head_form-"]');
-    
-            // Loop through all elements and update their name and id attributes based on the total number of forms
-            for (let index = 0; index < totalFormsValue; index++) {
-                const element = elements[index];
-    
-                // Ensure the element belongs to the correct form by updating the index
-                const updatedName = element.name.replace(/\d+/, index); // Replace the old index with the new one
-                element.setAttribute('name', updatedName);
-    
-                const updatedId = element.id.replace(/\d+/, index); // Similarly update the id attribute
-                element.setAttribute('id', updatedId);
-            }
-        }
-    }
-    
-    // On page load, make sure to update the form fields if there are any existing forms
-    document.addEventListener('DOMContentLoaded', function() {
-        updateFormFields(); // Update on initial load
-    });
+  
     
     
 

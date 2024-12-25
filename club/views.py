@@ -12,19 +12,14 @@ def create_new_record(request):
         
         # Handle the formset for EntryQueue using modelformset_factory
         total_forms = int(request.POST.get('column_head_form-TOTAL_FORMS', 0))
+        print(total_forms)
         
         # Create the EntryQueue formset with 'extra' as total_forms (if any)
         EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=total_forms)
         
         # Initialize the formset with POST data and prefix for EntryQueue
         column_head_formset = EntryQueueFormSet(request.POST, prefix='column_head_form')
-        print("Formset is valid:", column_head_formset.is_valid())
-        for idx, form in enumerate(column_head_formset):
-            print(f"Form {idx} is valid: {form.is_valid()}")
-            if not form.is_valid():
-                print(f"Form {idx} errors: {form.errors}")
-        # Now check if both the Ledager form and the EntryQueue formset are valid
-        if ledager_form.is_valid() and column_head_formset.is_valid():
+        if ledager_form.is_valid():
             # Save the Ledager form
             ledager_instance = ledager_form.save()
             print('Formset:', column_head_formset)
@@ -59,28 +54,11 @@ def create_new_record(request):
             'ledager_form': ledager_form,
             'column_head_formset': column_head_formset,
         })
-from django.forms import modelformset_factory
-from django.shortcuts import render
-from django.utils.safestring import mark_safe
-from .models import EntryQueue
-from .forms import EntryQueueForm  # Adjust if necessary
 
-def build_new_formset(formset, total):
-    """
-    Returns the HTML for a new form in the formset with the correct prefix for dynamic forms.
-    """
-    html = ""
-    
-    # Loop over the formset's forms
-    for form in formset.forms:
-        # Replace the `__prefix__` placeholder with the actual new index
-        form_html = str(form).replace('__prefix__', str(total))
-        html += form_html
-
-    return mark_safe(html)
 
 
 def add_column_head_form(request):
+    
     """
     Returns the HTML for a new EntryQueue form (for the column head) to be added via HTMX.
     """
@@ -88,26 +66,20 @@ def add_column_head_form(request):
     total_forms = int(request.POST.get('column_head_form-TOTAL_FORMS', 0))
 
     # Increment the total forms count
-    total_forms += 1
+    # total_forms += 1
 
     # Create the EntryQueue formset class with no initial data (empty formset)
-    EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm)
+    EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=total_forms)
 
     # Initialize the formset with the correct number of forms (empty queryset)
     column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
 
-    # Build the form HTML
-    total_formset = build_new_formset(column_head_formset, total_forms)
 
-    # Optionally pass specific forms if needed (e.g., the 3rd form)
-    head_set = column_head_formset.forms[2] if len(column_head_formset.forms) > 2 else None
 
     # Return the form HTML for the new form
     return render(request, 'club/partial_column_head_form.html', {
-        'column_head_formset': total_formset,
+        'column_head_formset': column_head_formset,
         'total_forms': total_forms,
-        'index_set': str(total_forms),
-        'head_set': head_set
     })
 
 
