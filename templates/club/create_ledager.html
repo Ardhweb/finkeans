@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <form method="POST" hx-target="#form-container">
+        {% csrf_token %}
+
+        <!-- Ledager form -->
+        <div class="form-group">
+            <h3>Ledager Information</h3>
+            {{ ledager_form.as_p }}
+        </div>
+
+        <!-- Table to display columns dynamically -->
+        <table class="table table-bordered table-striped table-hover shadow-sm p-3 mb-3">
+            <thead class="table-dark">
+                <tr>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- Render input fields dynamically in rows -->
+                    {% for form in column_head_formset %}
+                        <td class="text-center">
+                            {{ form.column_name }} <!-- Render the input field for column_name -->
+                        </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Formset container (includes management form for tracking the formset state) -->
+        <div id="form-container">
+            {{ column_head_formset.management_form.as_p }}
+        </div>
+
+        <!-- Button to add another column form -->
+        <div class="col-auto">
+            <button  id="col_adding_btn" type="button" class="btn btn-secondary mb-3" 
+                    hx-post="{% url 'club:add_column_head_form' %}"
+                    hx-include="#form-container"
+                    hx-target="thead tr"
+                    hx-swap="beforeend">
+                <i class="fas fa-plus"></i> Add Another Column
+            </button>
+
+            <button type="submit" class="btn btn-primary mb-3">
+                Make New Record / Add New Book
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let total_forms = {{ column_head_formset.management_form.TOTAL_FORMS.value }};
+    document.querySelector('#col_adding_btn').addEventListener('click', function(event) {
+        // Increment the TOTAL_FORMS value when a new column is added
+        const input = document.getElementById('id_column_head_form-TOTAL_FORMS');
+        let currentValue = parseInt(input.value, 10) || 0;
+        input.value = currentValue + 1;
+    
+        // Delay the update for a moment to ensure the new form is rendered in the DOM
+        setTimeout(function() {
+            // Get the current total number of forms
+            const totalFormsValue = parseInt(document.getElementById('id_column_head_form-TOTAL_FORMS').value, 10);
+    
+            if (!isNaN(totalFormsValue)) {
+                // Find all elements that have a name starting with 'column_head_form-'
+                const elements = document.querySelectorAll('[name^="column_head_form-"]');
+    
+                // Loop through all elements and update their name and id attributes based on total forms count
+                for (let index = 0; index < totalFormsValue; index++) {
+                    const element = elements[index];
+    
+                    // Calculate the new index to replace in name and id
+                    const updatedName = element.name.replace(/\d+/, index); // Replace the old index with the new one
+                    element.setAttribute('name', updatedName);
+    
+                    const updatedId = element.id.replace(/\d+/, index); // Similarly update the id attribute
+                    element.setAttribute('id', updatedId);
+                }
+            }
+        }, 500); // Adjust delay if needed to ensure the form is added in the DOM
+    });
+    
+    // MutationObserver to detect when new forms are added dynamically via htmx
+    const observer = new MutationObserver(function(mutationsList) {
+        mutationsList.forEach(function(mutation) {
+            // If new form fields are added, update their name and id
+            if (mutation.type === 'childList') {
+                // Call the update function after detecting DOM changes
+                updateFormFields();
+            }
+        });
+    });
+    
+    // Start observing changes to the formset container
+    const formContainer = document.getElementById('form-container');
+    observer.observe(formContainer, { childList: true, subtree: true });
+    
+    // Function to update name and id attributes for form fields
+    function updateFormFields() {
+        const totalFormsValue = parseInt(document.getElementById('id_column_head_form-TOTAL_FORMS').value, 10);
+    
+        if (!isNaN(totalFormsValue)) {
+            // Find all elements that have a name starting with 'column_head_form-'
+            const elements = document.querySelectorAll('[name^="column_head_form-"]');
+    
+            // Loop through all elements and update their name and id attributes based on the total number of forms
+            for (let index = 0; index < totalFormsValue; index++) {
+                const element = elements[index];
+    
+                // Ensure the element belongs to the correct form by updating the index
+                const updatedName = element.name.replace(/\d+/, index); // Replace the old index with the new one
+                element.setAttribute('name', updatedName);
+    
+                const updatedId = element.id.replace(/\d+/, index); // Similarly update the id attribute
+                element.setAttribute('id', updatedId);
+            }
+        }
+    }
+    
+    // On page load, make sure to update the form fields if there are any existing forms
+    document.addEventListener('DOMContentLoaded', function() {
+        updateFormFields(); // Update on initial load
+    });
+    
+    
+
+     
+      
+        
+     
+
+        
+    
+
+    
+</script>
+{% endblock %}

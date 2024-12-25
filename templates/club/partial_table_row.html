@@ -1,0 +1,6 @@
+<!-- partial_table_row.html -->
+<tr>
+    {% for form in column_head_formset %}
+        <td class="text-center">{{ form.field_name }}</td> <!-- Replace 'field_name' with the actual field from your form -->
+    {% endfor %}
+</tr>

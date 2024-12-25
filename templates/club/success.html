@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<body class="">
+
+    <!-- Container for centering the content -->
+    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="text-center">
+            <div class="alert alert-success">
+                <h1>Thank You!</h1>
+                <p>Your submission has been successfully received.</p>
+                 <a>{{last_record.title}}</a>
+            </div>
+            <a href="/" class="btn btn-primary">Go Back to Homepage</a>
+        </div>
+    </div>
+
+
+{% endblock content %}
