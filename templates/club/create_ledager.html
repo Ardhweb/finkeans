@@ -66,7 +66,7 @@
             let lastElement = elements[elements.length - 1]; // Last element with the class
             let lastChild = lastElement.lastElementChild.firstElementChild; // Last child of the last element
             lastChild.id = `id_column_head_form-${input.value-1}-column_title`
-            lastChild.name = `id_column_head_form-${input.value-1}-column_title`
+            lastChild.name = `column_head_form-${input.value-1}-column_title`
             lastElement.lastElementChild.lastElementChild.id = `id_column_head_form-${input.value-1}-basemodel_ptr`
               lastElement.lastElementChild.lastElementChild.name = `column_head_form-${input.value-1}-basemodel_ptr`
             console.log("Last child of the last element:", lastChild);

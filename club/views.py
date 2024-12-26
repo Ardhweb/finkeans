@@ -5,84 +5,64 @@ from .forms import LedagerForm, EntryQueueForm,EntryValueForm
 from .models import RecordLedgers, EntryQueue, EntryValue
 
 
+from django.forms import modelformset_factory
+
+'''
 def create_new_record(request):
+    EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=0, can_delete=False)
     if request.method == 'POST':
-        # Handle the Ledager form
-        ledager_form = LedagerForm(request.POST)
-        
-        # Handle the formset for EntryQueue using modelformset_factory
-        total_forms = int(request.POST.get('column_head_form-TOTAL_FORMS', 0))
-        print(total_forms)
-        
-        # Create the EntryQueue formset with 'extra' as total_forms (if any)
-        EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=total_forms)
-        
-        # Initialize the formset with POST data and prefix for EntryQueue
-        column_head_formset = EntryQueueFormSet(request.POST, prefix='column_head_form')
-        if ledager_form.is_valid():
-            # Save the Ledager form
-            ledager_instance = ledager_form.save()
-            print('Formset:', column_head_formset)
-
-            # Save each valid form in the EntryQueue formset
+        ledger_form = LedagerForm(request.POST)
+        column_head_formset = EntryQueueFormSet(request.POST, queryset=EntryQueue.objects.none(), prefix='column_head_form')
+        if ledger_form.is_valid() and column_head_formset.is_valid():
+            ledger_instance = ledger_form.save()  # Save the RecordLedgers instance
             for form in column_head_formset:
-                print('Form:',form)
-                if form.is_valid():  # Only save valid forms
-                    entry_queue_instance = form.save(commit=False)
-                    entry_queue_instance.record_ledgers = ledager_instance  # Link the EntryQueue to the RecordLedgers
-                    entry_queue_instance.save()
-            return redirect('club:success_record_column')  # Redirect to success page after saving
-        else:
-            # Debugging: Print the errors in case of validation failure
-            print("Ledager form errors:", ledager_form.errors)
-            for form in column_head_formset:
-                print("EntryQueue form errors:", form.errors)
-
-            return HttpResponse("Error: Form validation failed. Check the console for details.")
-
+                entry_queue = form.save(commit=False)
+                entry_queue.record_ledgers = ledger_instance  # Manually link to the RecordLedgers instance
+                entry_queue.save()
+            return redirect('club:success_record_column')
     else:
-        # Initialize the Ledager form
-        ledager_form = LedagerForm()
-
-        # Create the EntryQueue formset with no extra forms initially
-        EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=0)
-        
-        # Initialize the formset with an empty queryset (no existing EntryQueue instances)
+        ledger_form = LedagerForm()
         column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
-
-        return render(request, 'club/create_ledager.html', {
-            'ledager_form': ledager_form,
-            'column_head_formset': column_head_formset,
-        })
-
-
+    return render(request, 'club/create_ledager.html', {'ledager_form': ledger_form, 'column_head_formset': column_head_formset})
 
 def add_column_head_form(request):
-    
-    """
-    Returns the HTML for a new EntryQueue form (for the column head) to be added via HTMX.
-    """
-    # Get the current total number of forms already in the formset (from the request or session)
     total_forms = int(request.POST.get('column_head_form-TOTAL_FORMS', 0))
-
-    # Increment the total forms count
-    # total_forms += 1
-
-    # Create the EntryQueue formset class with no initial data (empty formset)
-    EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=total_forms)
-
-    # Initialize the formset with the correct number of forms (empty queryset)
+    EntryQueueFormSet = modelformset_factory(EntryQueue, form=EntryQueueForm, extra=total_forms, can_delete=False)
     column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
+    return render(request, 'club/partial_column_head_form.html', {'column_head_formset': column_head_formset, 'total_forms': total_forms})
 
+'''
 
+from django.forms.models import inlineformset_factory
+from django.shortcuts import render, redirect
 
-    # Return the form HTML for the new form
-    return render(request, 'club/partial_column_head_form.html', {
-        'column_head_formset': column_head_formset,
-        'total_forms': total_forms,
-    })
+def create_new_record(request):
+    EntryQueueFormSet = inlineformset_factory(
+        RecordLedgers, EntryQueue, form=EntryQueueForm, extra=0, fk_name="record_ledgers", can_delete=False
+    )
+    if request.method == 'POST':
+        ledger_form = LedagerForm(request.POST)
+        column_head_formset = EntryQueueFormSet(request.POST, prefix='column_head_form')
+        if ledger_form.is_valid() and column_head_formset.is_valid():
+            # Save the RecordLedgers instance first
+            ledger_instance = ledger_form.save()
+            # Assign the saved instance to the formset
+            column_head_formset.instance = ledger_instance
+            # Save the formset
+            column_head_formset.save()
+            return redirect('club:success_record_column')
+    else:
+        ledger_form = LedagerForm()
+        column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
+    return render(request, 'club/create_ledager.html', {'ledager_form': ledger_form, 'column_head_formset': column_head_formset})
 
-
+def add_column_head_form(request):
+    total_forms = int(request.POST.get('column_head_form-TOTAL_FORMS', 0))
+    EntryQueueFormSet = inlineformset_factory(
+        RecordLedgers, EntryQueue, form=EntryQueueForm, extra=total_forms, fk_name="record_ledgers", can_delete=False
+    )
+    column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
+    return render(request, 'club/partial_column_head_form.html', {'column_head_formset': column_head_formset, 'total_forms': total_forms})
 
 
 

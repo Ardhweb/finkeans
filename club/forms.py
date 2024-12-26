@@ -15,7 +15,7 @@ class EntryQueueForm(forms.ModelForm):
     class Meta:
         model = EntryQueue
         fields = ['column_title']
-        widgets ={'column_title':forms.TextInput( attrs={'class':'  border-bottom  form-control text-center  fw-semibold fs-5', 'placeholder': 'Enter your col title.','value':''}),}
+        widgets ={'column_title':forms.TextInput( attrs={'class':'  border-bottom  form-control text-center  fw-semibold fs-5', 'placeholder': 'Enter your col title.'}),}
     
     #Hide For All Labels from Form
     # def __init__(self, *args, **kwargs):
