@@ -15,7 +15,7 @@ class EntryQueueForm(forms.ModelForm):
     class Meta:
         model = EntryQueue
         fields = ['column_title']
-        widgets ={'column_title':forms.TextInput( attrs={'class':'  border-bottom  form-control text-center  fw-semibold fs-5', 'placeholder': 'Enter your col title.'}),}
+        widgets ={'column_title':forms.TextInput( attrs={'class':'  border-bottom  form-control text-center  fw-semibold ', 'placeholder': 'Column Name'}),}
     
     #Hide For All Labels from Form
     # def __init__(self, *args, **kwargs):
@@ -33,7 +33,8 @@ class EntryValueForm(forms.ModelForm):
     class Meta:
         model = EntryValue
         fields = ['entries_value']
-        widgets ={'entries_value':forms.TextInput( attrs={'class':'  border-bottom  form-control',}),}
+        widgets ={'entries_value':forms.TextInput( attrs={'class':'border-0 bg-transparent h-100   form-control',}),}
+    
     def __init__(self, *args, **kwargs):
         super(EntryValueForm, self).__init__(*args, **kwargs)
         self.fields['entries_value'].label = "" 

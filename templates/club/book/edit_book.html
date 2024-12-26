@@ -2,8 +2,25 @@
 
 {% block content %}
 <div class="container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="container mt-4">
+            <div class="btn-group fixed-top bg-white p-2 shadow">
+              <button type="submit" class="btn btn-primary me-3 mb-2">
+                <i class="fas fa-paper-plane"></i> Submit / Save File
+              </button>
+              <button type="button" class="btn btn-info me-3 mb-2">
+                <i class="fas fa-plus-circle"></i> Single Row
+              </button>
+              <button type="button" class="btn btn-success me-3 mb-2">
+                <i class="fas fa-layer-group"></i> Add Multiple Rows
+              </button>
+            </div>
+          </div>
+          
+          
   
-    <table class="table table-bordered table-striped mt-4 table-hover  border rounded  shadow-sm p-2">
+    <table class="table-responsive table table-bordered table-striped mt-4 table-hover  border rounded  shadow-sm p-2">
         <thead>
             <tr>
                 <th scope="col" class="">No.</th>
@@ -13,9 +30,20 @@
             {% endfor %}
             </tr>
         </thead>
-        <tbody>
+        <tbody style="max-height:20px!important;"  class=" overflow-scroll">
+
+            {{ formset.management_form }}
+            {% for form in formset  %}
+             <tr>
+                <td class="">{{forloop.counter}}</td>
+                {% for columns in related_column_names  %}
+                <td class="">{{form.as_p}}</td>
+                {% endfor %}
+             </tr>
+            {% endfor %}
         
         </tbody>
     </table>
+</form>
 </div>
 {% endblock content %}

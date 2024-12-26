@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <form method="POST" hx-target="#form-container">
+    <form method="POST" hx-target="#form-container" class="p-4 m-2 shadow-sm bg-body-secondary rounded">
         {% csrf_token %}
 
         <!-- Ledager form -->
@@ -10,25 +10,38 @@
             <h3>Ledager Information</h3>
             {{ ledager_form.as_p }}
         </div>
+        <div class="">
+            <h3>Chart Column's Heading</h3>
+           
+        </div>
+
+
+
 
         <!-- Table to display columns dynamically -->
-        <table class="table table-bordered table-striped table-hover shadow-sm p-3 mb-3">
-            <thead class="table-dark">
+        <table class="table table-bordered table-hover shadow-sm p-3 mb-3">
+            <thead class="table-dark ">
 
-                <tr>
-
-                </tr>
-             
-            </thead>
-            <tbody>
-                <tr>
-                    <!-- Render input fields dynamically in rows -->
-                    {% for form in column_head_formset %}
+                <tr class="overflow-scroll">
+                    <th>No.</th>
+                      {% for form in column_head_formset %}
+                    <td>{{ forloop.counter }}</td>
+                  
                         <td class="text-center">
                             {{ form.column_name }} <!-- Render the input field for column_name -->
                         </td>
                     {% endfor %}
                 </tr>
+                
+             
+            </thead>
+            <tbody id="ledager-book-body-row">
+                <tr>
+                    <!-- Render input fields dynamically in rows -->
+                  
+                   
+                </tr>
+               
             </tbody>
         </table>
 
@@ -60,6 +73,40 @@
         const input = document.getElementById('id_column_head_form-TOTAL_FORMS');
         let currentValue = parseInt(input.value, 10) || 0;
         input.value = currentValue + 1;
+
+        const tbody = document.getElementById('ledager-book-body-row');
+
+        // Ensure only one row exists and add new <td> for each new column
+      
+            if (tbody) {
+                // Check if the first row exists, create it if it doesn't
+                let row = tbody.querySelector('tr');
+                if (!row) {
+                    row = document.createElement('tr');
+                    tbody.appendChild(row);
+        
+                    // Add the counter column in the first column (Row 1)
+                    const counterTd = document.createElement('td');
+                    counterTd.textContent = `1`;
+                    row.appendChild(counterTd);
+                    
+
+                    
+                }
+        
+                // Add a new column (td) to the existing row
+                const newTd = document.createElement('td');
+                newTd.className = 'text-center';
+                newTd.innerHTML = 'Here you can put data'; // Replace with dynamic content as needed
+                row.appendChild(newTd);
+                
+        
+                // Update counter text if needed (in case you need it dynamic later)
+                const counterTd = row.querySelector('td');
+                counterTd.textContent = `1`; // Make sure it always says "Row 1" if there's only one row
+            }
+        
+        
         setTimeout(function() {
             
             let elements = document.querySelectorAll('.column-head-form-container');
@@ -68,8 +115,13 @@
             lastChild.id = `id_column_head_form-${input.value-1}-column_title`
             lastChild.name = `column_head_form-${input.value-1}-column_title`
             lastElement.lastElementChild.lastElementChild.id = `id_column_head_form-${input.value-1}-basemodel_ptr`
-              lastElement.lastElementChild.lastElementChild.name = `column_head_form-${input.value-1}-basemodel_ptr`
+            lastElement.lastElementChild.lastElementChild.name = `column_head_form-${input.value-1}-basemodel_ptr`
             console.log("Last child of the last element:", lastChild);
+
+
+          
+
+          
           }, 2000);  // Wait 1000ms (1 second) before executing the code
           
     
