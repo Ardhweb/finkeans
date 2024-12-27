@@ -10,7 +10,13 @@
                 <h1>Thank You!</h1>
                 <p>Your submission has been successfully received.</p>
                  <a>{{last_record.title}}</a>
+                 <div class="container">
+                    <a href="{% url 'club:insert_databook' id=last_record.id %}" class="btn btn-success">View Last Update</a>
+
+                 </div>
+                 
             </div>
+
             <a href="/" class="btn btn-primary">Go Back to Homepage</a>
         </div>
     </div>

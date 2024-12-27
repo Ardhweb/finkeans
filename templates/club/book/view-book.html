@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+        <div class="container mt-4">
+            <div class="  bg-white p-2 shadow">
+                <a href="{% url "club:insert_databook" id=id %}" class="btn btn-info me-3 mb-2">
+                    <i class="fas fa-pencil-alt"></i>Insert/Add
+                </a>
+                <button type="button" class="btn btn-primary me-3 mb-2">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+      
+        <table class="table-responsive table table-bordered table-striped mt-4 table-hover border rounded shadow-sm p-2">
+            <thead>
+                <tr>
+                    <th scope="col" class="">No.</th>
+                    {% for column in related_column_names %}
+                    <th scope="col">{{ column.column_title }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in combined_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>  <!-- Corrected: closing <td> tag for the counter -->
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+{% endblock content %} 

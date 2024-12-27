@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-
+{% block title %}<title>Insert Book</title>{% endblock title %}
 {% block content %}
 <div class="container">
+
     <form method="POST">
         {% csrf_token %}
         <div class="container mt-4">
@@ -37,7 +38,10 @@
              <tr>
                 <td class="">{{forloop.counter}}</td>
                 {% for columns in related_column_names  %}
-                <td class="">{{form.as_p}}</td>
+                {% comment %} <td class="">{{form.as_p}}</td> {% endcomment %}
+                <td>
+                  <input type="text" class="form-control border-0" value="" name="{{columns.column_title}}-columns">
+                </td>
                 {% endfor %}
              </tr>
             {% endfor %}

@@ -32,42 +32,64 @@ def add_column_head_form(request):
     column_head_formset = EntryQueueFormSet(queryset=EntryQueue.objects.none(), prefix='column_head_form')
     return render(request, 'club/partial_column_head_form.html', {'column_head_formset': column_head_formset, 'total_forms': total_forms})
 
-
-
+ 
 
 
 def insert_databook(request, id):
-    # Get related EntryQueue instances (these are the "columns")
     related_column_names = EntryQueue.objects.filter(record_ledgers__id=id)
-    total_related_columns = related_column_names.count()
-
-    # Create the formset factory for EntryValue forms (these are the "rows")
     formset = inlineformset_factory(EntryQueue, EntryValue, form=EntryValueForm, extra=4, fk_name="column", can_delete=False)
-
     if request.method == 'POST':
-        # Create and bind formset with POST data
+        total_forms_count = request.POST.get('entryvalue_set-TOTAL_FORMS') 
+        print(formset)
+        for name in related_column_names:
+            column_title = name.column_title  # Assuming `name` has a `column_title` attribute
+            values = request.POST.getlist(f'{column_title}-columns')  # Fetch list of values
+            print(values)
+            for value in values:
+                EntryValue.objects.create(entries_value=value, column=name)
         formset_instance = formset(request.POST)
-        
-        # Assign each form in the formset to its respective EntryQueue column
-        for i, form in enumerate(formset_instance):
-            # Ensure we link each form to the correct EntryQueue (column)
-            form.instance.column = related_column_names[i]  # Link form to the appropriate column
-
         if formset_instance.is_valid():
-            formset_instance.save()  # Save all valid forms (rows)
-
+            '''for form in formset_instance:
+                print(form)  # Prints the form representation
+                print(form.as_table())'''  # Prints the HTML representation of the form
+            print(formset.forms)
+            formset_instance.save(commit=False)
         return redirect('club:success_record_column')
-
     else:
-        # Initialize empty formset for GET request, passing queryset of EntryQueue instances
         formset_instance = formset(queryset=related_column_names)
-
-        context = {
-            'related_column_names': related_column_names,
-            'total_related_columns': total_related_columns,
-            'formset': formset_instance
-        }
+        for i, form in enumerate(formset_instance):
+            print(f"Form Index: {i}, Name Field: {form.fields.get('name')}")
+        context = {'related_column_names': related_column_names, 'formset': formset_instance}
         return render(request, "club/book/edit_book.html", context)
+
+
+
+def view_databook(request, id):
+    related_column_names = EntryQueue.objects.filter(record_ledgers__id=id)
+    combined_data = []
+    for entry_queue in related_column_names:
+        # Fetching all EntryValue objects related to the current EntryQueue
+        books_by_author = entry_queue.entryvaluechild.all()
+        combined_data.append({
+            'entryQueueName': entry_queue.column_title,  # The name of the EntryQueue
+            'values': [value.entries_value for value in books_by_author]  # List of EntryValue values
+        })
+    # Transpose combined_data so that each row corresponds to a set of values from each EntryQueue
+    max_length = max(len(item['values']) for item in combined_data)
+    transposed_data = []
+    for i in range(max_length):
+        row = []
+        for item in combined_data:
+            row.append(item['values'][i] if i < len(item['values']) else None)
+        transposed_data.append(row)
+    context = {
+        'combined_data': transposed_data,  # Transposed data to match the table format
+        'related_column_names': related_column_names , # Column titles (EntryQueue names)
+        "id":id,
+    }
+    # 5. Render the template with the context
+    return render(request, "club/book/view-book.html", context)
+
 
 
 def success_record_col(request):

@@ -7,5 +7,6 @@ urlpatterns = [
     path('success-record-column/', views.success_record_col, name="success_record_column"),
     path('club-dashboard/', views.club_dashboard, name="club_dashboard"),
     path('<int:id>/insert-databook/', views.insert_databook, name="insert_databook"),
+    path('<int:id>/view-databook/', views.view_databook, name="view_databook"),
     
 ]

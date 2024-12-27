@@ -12,5 +12,5 @@ class EntryQueue(BaseModel):
 
     
 class EntryValue(BaseModel):
-    column = models.ForeignKey(EntryQueue, on_delete=models.SET_NULL, null=True)
+    column = models.ForeignKey(EntryQueue, related_name="entryvaluechild", on_delete=models.SET_NULL, null=True)
     entries_value =  models.CharField(max_length=50, blank=True, null=True)
