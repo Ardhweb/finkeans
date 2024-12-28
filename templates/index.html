@@ -1,4 +1,7 @@
 {% extends "base.html" %}
 {% block title %}<title>Home</title>{% endblock title %}
 
-{% block content %}{% endblock content %}
+{% block content %}
+{% include "components/layouts/partials/headers.html" %}
+{% include "components/layouts/card-main.html" %}
+{% endblock content %}
