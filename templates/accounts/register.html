@@ -1,10 +1,11 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}Create an account{% endblock %}
+{% block title %}<title>Sign-up</title>{% endblock %}
 {% block content %}
 <div class="">
+    <div class="fs-5 bg-body-tertiary shadow rounded px-3 py-1 mb-1 text-center"style="width: 450px; height: 25%; margin: 0 auto; margin-top: 10%; background-color: #f4f4f9;"><h4>Create an account</h4></div>
  <!--Login Form Start Here-->
- <form method="post" class="fs-5 bg-body-tertiary p-4 shadow mb-5 rounded" style="width: 350px; height: 25%; margin: 0 auto; margin-top: 10%; background-color: #f4f4f9;">
+ <form method="post" class="fs-5 bg-body-tertiary p-4 shadow mb-5 rounded" style="width: 450px; height: 25%; margin: 0 auto; background-color: #f4f4f9;">
     {{ user_form.as_p }}
     {% csrf_token %}
     <div class="form-check mt-3">

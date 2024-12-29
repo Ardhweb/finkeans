@@ -11,13 +11,11 @@ class RegistrationForm(forms.ModelForm):
     password2 = forms.CharField(label='Repeat Password', widget=forms.PasswordInput(attrs={'class':'form-control text-center'}))
     class Meta:
         model = User
-        fields = ('first_name', 'email')
+        fields = ('first_name', 'email', 'username')
         widgets ={
-                
                 'first_name':forms.TextInput(attrs={'class':'form-control text-center '}),
                 'email':forms.TextInput(attrs={'class':'form-control text-center  '}),
-                
-                
+                'username':forms.TextInput(attrs={'class':'form-control text-center '}) , 
             }
       
         

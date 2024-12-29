@@ -31,7 +31,7 @@ def register(request):
 
             new_user.save()
 
-            return render(request,'accounts/register_done.html',{'new_user': new_user})
+            return redirect('accounts:account_login')
     else:
         user_form = RegistrationForm()
     return render(request,'accounts/register.html',{'user_form': user_form})
@@ -54,7 +54,7 @@ def user_login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('club:dashboard')
+                    return redirect('club:club_dashboard')
                 else:
                     return HttpResponse('Disabled account')
             else:
