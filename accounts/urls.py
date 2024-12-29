@@ -18,5 +18,4 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     #reg
     path('register/', views.register, name='register'),
-    path('signup', views.signup, name='signup'),
 ]

@@ -2,15 +2,21 @@
 
 {% block title %}Create an account{% endblock %}
 {% block content %}
-<div class="text-center">
- <h1>Create an account</h1>
- <p>Please, sign up using the following form:</p>
- <form method="post" class="border container shadow-lg text-center">
- <div class="text-left h6">
- {{ user_form.as_p }}
- {% csrf_token %}
- <p><input type="submit" value="Create my account" class="btn btn-primary btn-lg btn-md rounded-0"></p>
- <div>
- </form>
+<div class="">
+ <!--Login Form Start Here-->
+ <form method="post" class="fs-5 bg-body-tertiary p-4 shadow mb-5 rounded" style="width: 350px; height: 25%; margin: 0 auto; margin-top: 10%; background-color: #f4f4f9;">
+    {{ user_form.as_p }}
+    {% csrf_token %}
+    <div class="form-check mt-3">
+        <input type="checkbox" class="form-check-input" id="rememberMe">
+        <label class="form-check-label" for="rememberMe">Remember Me</label>
+    </div>
+    <p><input type="submit" class="btn btn-warning btn-md mt-4 w-100 rounded" value="Submit"></p>
+    <div class="bottom-links mt-3 fs-6">
+        
+        <a href="{% url "accounts:account_login" %}" style="color: #007bff;">Already have account? log-in</a>
+    </div>
+</form>
+<a href="{% url "index" %}" class="btn btn-primary m-4 ">Back Home </a>  
  <div>
 {% endblock %}
