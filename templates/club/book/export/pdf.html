@@ -1,18 +1,8 @@
-{% extends "base.html" %}
+{% extends "club/book/export/base.html" %}
 
 {% block content %}
 <div class="container">
-        <div class="container mt-4">
-            <div class="  bg-white p-2 shadow">
-                <a href="{% url "club:insert_databook" id=id %}" class="btn btn-info me-3 mb-2">
-                    <i class="fas fa-pencil-alt"></i>Insert/Add
-                </a>
-                <a href="{% url "club:download_pdf" id=id %}" class="btn btn-primary me-3 mb-2">
-                    <i class="fas fa-download"></i> Download PDF
-                </a>
-            </div>
-        </div>
-        <div class="table-responsive">
+
         <table class="table table-bordered table-striped mt-4 table-hover border rounded shadow-sm p-2">
             <thead class="sticky-top">
                 <tr>
@@ -33,6 +23,5 @@
                 {% endfor %}
             </tbody>
         </table>
-        </div>  
 </div>
 {% endblock content %} 

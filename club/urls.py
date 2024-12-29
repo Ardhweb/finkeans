@@ -8,5 +8,6 @@ urlpatterns = [
     path('club-dashboard/', views.club_dashboard, name="club_dashboard"),
     path('<int:id>/insert-databook/', views.insert_databook, name="insert_databook"),
     path('<int:id>/view-databook/', views.view_databook, name="view_databook"),
+    path('<int:id>/download/pdf',views.download_pdf,name='download_pdf'),
     
 ]

@@ -3,6 +3,10 @@ from django.http import HttpResponse
 from django.forms import modelformset_factory, formset_factory,inlineformset_factory
 from .forms import LedagerForm, EntryQueueForm,EntryValueForm
 from .models import RecordLedgers, EntryQueue, EntryValue
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+import weasyprint
 
 def create_new_record(request):
     EntryQueueFormSet = inlineformset_factory(
@@ -101,3 +105,37 @@ def club_dashboard(request):
     query_record_ledagers =  RecordLedgers.objects.all()
     context = {"created_book_records":query_record_ledagers,}
     return render(request, "club/club_dashboard.html", context)
+
+
+
+def download_pdf(request, id):
+    file_name = RecordLedgers.objects.get(id=id)
+    related_column_names = EntryQueue.objects.filter(record_ledgers__id=id)
+    combined_data = []
+    for entry_queue in related_column_names:
+        # Fetching all EntryValue objects related to the current EntryQueue
+        books_by_author = entry_queue.entryvaluechild.all()
+        combined_data.append({
+            'entryQueueName': entry_queue.column_title,  # The name of the EntryQueue
+            'values': [value.entries_value for value in books_by_author]  # List of EntryValue values
+        })
+    # Transpose combined_data so that each row corresponds to a set of values from each EntryQueue
+    max_length = max(len(item['values']) for item in combined_data)
+    transposed_data = []
+    for i in range(max_length):
+        row = []
+        for item in combined_data:
+            row.append(item['values'][i] if i < len(item['values']) else None)
+        transposed_data.append(row)
+ 
+    html = render_to_string('club/book/export/pdf.html',
+       context = {
+           'combined_data': transposed_data,  # Transposed data to match the table format
+           'related_column_names': related_column_names , # Column titles (EntryQueue names)
+           "id":id,
+       })
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename={file_name.title}.pdf'
+    weasyprint.HTML(string=html).write_pdf(response,
+    )
+    return response
