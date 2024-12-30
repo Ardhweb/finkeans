@@ -9,5 +9,6 @@ urlpatterns = [
     path('<int:id>/insert-databook/', views.insert_databook, name="insert_databook"),
     path('<int:id>/view-databook/', views.view_databook, name="view_databook"),
     path('<int:id>/download/pdf',views.download_pdf,name='download_pdf'),
+    path('<int:id>/viewedit-databook/', views.viewedit_databook, name="viewedit_databook"),
     
 ]

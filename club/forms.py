@@ -5,8 +5,9 @@ from club.models import RecordLedgers,EntryQueue,EntryValue
 class LedagerForm(forms.ModelForm):
     class Meta:
         model = RecordLedgers
-        fields = "__all__"
-        widgets ={'title':forms.TextInput(attrs={'class':'form-control text-center w-50 '}),}
+        fields = ['title']
+        widgets ={'title':forms.TextInput(attrs={'class':'form-control text-center w-50 '}),
+        }
     def __init__(self, *args, **kwargs):
         super(LedagerForm, self).__init__(*args, **kwargs)
         self.fields['title'].label = "RecordBook~ Khata Naam"

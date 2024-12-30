@@ -1,9 +1,11 @@
 from django.db import models
 from core.models import BaseModel
+from django.contrib.auth.models import User
 # Create your models here.
 
 class RecordLedgers(BaseModel):
     title = models.CharField(max_length=50, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 
 class EntryQueue(BaseModel):

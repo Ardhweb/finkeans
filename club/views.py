@@ -7,6 +7,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 import weasyprint
+from django.contrib.auth.models import User
 
 def create_new_record(request):
     EntryQueueFormSet = inlineformset_factory(
@@ -17,7 +18,9 @@ def create_new_record(request):
         column_head_formset = EntryQueueFormSet(request.POST, prefix='column_head_form')
         if ledger_form.is_valid() and column_head_formset.is_valid():
             # Save the RecordLedgers instance first
-            ledger_instance = ledger_form.save()
+            ledger_instance = ledger_form.save(commit=False)
+            ledger_instance.user = request.user
+            ledger_instance.save()
             # Assign the saved instance to the formset
             column_head_formset.instance = ledger_instance
             # Save the formset
@@ -102,7 +105,7 @@ def success_record_col(request):
 
 
 def club_dashboard(request):
-    query_record_ledagers =  RecordLedgers.objects.all()
+    query_record_ledagers =  RecordLedgers.objects.filter(user=request.user)
     context = {"created_book_records":query_record_ledagers,}
     return render(request, "club/club_dashboard.html", context)
 
@@ -139,3 +142,33 @@ def download_pdf(request, id):
     weasyprint.HTML(string=html).write_pdf(response,
     )
     return response
+
+
+
+
+def viewedit_databook(request, id):
+    related_column_names = EntryQueue.objects.filter(record_ledgers__id=id)
+    combined_data = []
+    for entry_queue in related_column_names:
+        # Fetching all EntryValue objects related to the current EntryQueue
+        books_by_author = entry_queue.entryvaluechild.all()
+        combined_data.append({
+            'entryQueueName': entry_queue.column_title,  # The name of the EntryQueue
+            'values': [value.entries_value for value in books_by_author]  # List of EntryValue values
+        })
+    # Transpose combined_data so that each row corresponds to a set of values from each EntryQueue
+    max_length = max(len(item['values']) for item in combined_data)
+    transposed_data = []
+    for i in range(max_length):
+        row = []
+        for item in combined_data:
+            row.append(item['values'][i] if i < len(item['values']) else None)
+        transposed_data.append(row)
+    context = {
+        'combined_data': transposed_data,  # Transposed data to match the table format
+        'related_column_names': related_column_names , # Column titles (EntryQueue names)
+        "id":id,
+    }
+    # 5. Render the template with the context
+    return render(request, "club/book/viewedit-book.html", context)
+

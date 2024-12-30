@@ -10,7 +10,7 @@
               <button type="submit" class="btn btn-primary me-3 mb-2">
                 <i class="fas fa-paper-plane"></i> Submit / Save File
               </button>
-              <button type="button" class="btn btn-info me-3 mb-2">
+              <button id="addRow"  type="button" class="btn btn-info me-3 mb-2">
                 <i class="fas fa-plus-circle"></i> Single Row
               </button>
               <button type="button" class="btn btn-success me-3 mb-2">
@@ -21,7 +21,7 @@
           
           
     <div class="table-responsive">
-    <table class="table table-bordered table-striped mt-4 table-hover  border rounded  shadow-sm p-2">
+    <table id="myTable" class="table table-bordered table-striped mt-4 table-hover  border rounded  shadow-sm p-2">
         <thead class="sticky-top">
             <tr>
                 <th scope="col" class="">No.</th>
@@ -51,4 +51,20 @@
   </div>
 </form>
 </div>
+<script>
+  let total_forms_val = document.getElementById("id_entryvaluechild-TOTAL_FORMS")
+  document.getElementById("addRow").addEventListener("click", function () {
+    const tableBody = document.querySelector("#myTable tbody");
+    const lastRow = tableBody.lastElementChild;
+    const newRow = lastRow.cloneNode(true); // Clone the last row
+    newRow.firstElementChild.innerHTML = parseInt(total_forms_val.value)+1
+    total_forms_val.value = parseInt(total_forms_val.value)+1;
+    console.log(parseInt(total_forms_val.value)+1)
+    tableBody.appendChild(newRow); // Append the new row to the tbody
+  });
+  
+
+      
+  
+</script>
 {% endblock content %}
