@@ -37,7 +37,8 @@ To run this project, you will need to add the following environment variables to
 To deploy this project run
 
 ```bash
-  npm run deploy
+uvicorn finkeans.asgi:application --host 127.0.0.1 --port 8000
+gunicorn finkeans.asgi:application 
 ```
 
 
